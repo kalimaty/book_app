@@ -38,27 +38,37 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    //  final color = Theme.of(context).colorScheme.primaryContainer;
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // backgroundColor: Color.fromARGB(105, 135, 14, 185),
-        backgroundColor: Color.fromARGB(103, 159, 14, 185),
+class _MyHomePageState extends State<MyHomePage>
+    with SingleTickerProviderStateMixin {
+  late StartUpAnimation startupAnimation;
+  late AnimationController animationController;
+  void openPDF(BuildContext context, File file) {
+    Navigator.of(context)
+        .push(
+            MaterialPageRoute(builder: (context) => PDFViewerPage(file: file)))
+        .then((result) {
+      _createStartUpAnimation();
+    });
+  }
 
-        title: Text(
-          widget.title,
-          style: TextStyle(
-              fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        toolbarHeight: 50,
-      ),
-      body: StartUpAnimation(
-        animationDuration: 4,
+  @override
+  void dispose() {
+    // Dispose animation controller
+    animationController.dispose();
+    super.dispose();
+  }
+
+  void _createStartUpAnimation() {
+    animationController.reset();
+    // Start animation
+    Future.delayed(const Duration(seconds: 1), () {
+      // print('One second has passed.'); // Prints after 1 second.
+      animationController.forward();
+    });
+    setState(() {
+      startupAnimation = StartUpAnimation(
         crossAxisCount: 3,
+        animationController: animationController,
         children: <Widget>[
           ButtonWidget(
             text: 'الأحياء',
@@ -99,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
 
           ButtonWidget(
-            text: 'التفاضل والتكامل',
+            text: 'تفاضلِ  \n \وتكامل ',
             onClicked: () async {
               final path = 'assets/تفاضل وتكامل.pdf';
               final file = await PDFApi.loadAsset(path);
@@ -148,11 +158,40 @@ class _MyHomePageState extends State<MyHomePage> {
           //   height: 16,
           // ),
         ],
+        animationDuration: 4,
+      );
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 4), // or any other duration you prefer
+    );
+    _createStartUpAnimation();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //  final color = Theme.of(context).colorScheme.primaryContainer;
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        // backgroundColor: Color.fromARGB(105, 135, 14, 185),
+        backgroundColor: Color.fromARGB(103, 159, 14, 185),
+
+        title: Text(
+          widget.title,
+          style: TextStyle(
+              fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+        toolbarHeight: 50,
       ),
+      body: startupAnimation,
     );
   }
 }
-
-void openPDF(BuildContext context, File file) => Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => PDFViewerPage(file: file)),
-    );

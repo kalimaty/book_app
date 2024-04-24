@@ -17,7 +17,7 @@ class ButtonWidget extends StatelessWidget {
           padding: EdgeInsets.all(5),
           alignment: Alignment(0, 0),
           height: 100,
-          width: 200,
+          width: 100,
           margin: EdgeInsets.all(5),
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),

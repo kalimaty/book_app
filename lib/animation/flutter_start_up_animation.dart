@@ -4,11 +4,13 @@ class StartUpAnimation extends StatefulWidget {
   final int crossAxisCount;
   final List<Widget> children;
   final int animationDuration;
+  final AnimationController animationController;
   const StartUpAnimation(
       {Key? key,
       required this.crossAxisCount,
       required this.children,
-      required this.animationDuration})
+      required this.animationDuration,
+      required this.animationController})
       : super(key: key);
 
   @override
@@ -17,16 +19,9 @@ class StartUpAnimation extends StatefulWidget {
 
 class _StartUpAnimationState extends State<StartUpAnimation>
     with SingleTickerProviderStateMixin {
-  late final AnimationController animationController;
   List<Animation<double>> animations = [];
   @override
   void initState() {
-    animationController = AnimationController(
-      vsync: this,
-      duration: Duration(
-        seconds: widget.animationDuration,
-      ),
-    );
     double wait = 1 / widget.children.length;
     double start = 0.0;
     double end = wait;
@@ -37,21 +32,14 @@ class _StartUpAnimationState extends State<StartUpAnimation>
           end,
           curve: Curves.linear,
         ),
-      ).animate(animationController);
+      ).animate(widget.animationController);
       animations.add(animation);
       start += wait;
       end += wait;
     }
-    animationController.forward();
+    widget.animationController.forward();
     // TODO: implement initState
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    animationController.dispose();
-    // TODO: implement dispose
-    super.dispose();
   }
 
   @override
@@ -59,7 +47,7 @@ class _StartUpAnimationState extends State<StartUpAnimation>
     return Directionality(
       textDirection: TextDirection.rtl,
       child: GridView.count(
-        padding: EdgeInsets.all(16),
+        padding: EdgeInsets.all(20),
         scrollDirection: Axis.vertical,
         // physics: AlwaysScrollableScrollPhysics(),
         crossAxisCount: widget.crossAxisCount,
@@ -68,7 +56,7 @@ class _StartUpAnimationState extends State<StartUpAnimation>
             (element) => element == child,
           );
           return ScaleTransition(
-            // alignment: Alignment.centerRight,
+            alignment: Alignment.center,
             scale: animations[index],
             child: child,
           );
